@@ -1,0 +1,5 @@
+# raylib image viewer
+./raylib_zig_image_viewer/.zig-cache
+./raylib_zig_image_viewer/.zig-cache/*
+./raylib_zig_image_viewer/zig-out
+./raylib_zig_image_viewer/zig-out/*
