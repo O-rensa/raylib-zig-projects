@@ -2,6 +2,8 @@ const std = @import("std");
 const rl = @import("raylib");
 
 const Texture2dArrayList = std.ArrayList(rl.Texture2D);
+const CLEAR_TEXTURES_KEY = rl.KeyboardKey.key_backspace;
+const MOUSE_WHEEL_MOVE_SENS = 0.01;
 
 pub fn main() !void {
     const screenWidth = 800;
@@ -26,7 +28,28 @@ pub fn main() !void {
         textures.deinit();
     }
 
+    const txtr_filter = rl.TextureFilter.texture_filter_trilinear;
+    var translation = rl.Vector2{ .x = 0, .y = 0 };
+    var zoom: f32 = 0.3;
+
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
+        // deletes the all the picture(s) if backspace is clicked
+        if (rl.isKeyPressed(CLEAR_TEXTURES_KEY)) {
+            for (textures.items) |texture| {
+                rl.unloadTexture(texture);
+            }
+            textures.clearRetainingCapacity();
+        }
+
+        if (rl.isMouseButtonDown(rl.MouseButton.mouse_button_left)) {
+            translation = rl.Vector2.add(translation, rl.getMouseDelta());
+        }
+
+        const mouse_wheel_move = rl.getMouseWheelMove();
+        if (mouse_wheel_move != 0) {
+            zoom += mouse_wheel_move * MOUSE_WHEEL_MOVE_SENS;
+        }
+
         if (rl.isFileDropped()) {
             const dropped_files = rl.loadDroppedFiles();
             defer rl.unloadDroppedFiles(dropped_files);
@@ -43,21 +66,22 @@ pub fn main() !void {
                 }
 
                 // set texture filter
-                rl.setTextureFilter(texture, rl.TextureFilter.texture_filter_trilinear);
+                rl.setTextureFilter(texture, txtr_filter);
                 try textures.append(texture);
             }
         }
 
-        { // drawing
+        { // drawing or rendering
             rl.beginDrawing();
             defer rl.endDrawing();
             rl.clearBackground(rl.Color.white); // background color
 
-            var x: i32 = 0;
+            var x: f32 = 0;
 
             for (textures.items) |texture| {
-                rl.drawTextureEx(texture, rl.Vector2{ .x = @floatFromInt(x), .y = 0 }, 0, 0.3, rl.Color.white);
-                x += texture.width;
+                rl.drawTextureEx(texture, rl.Vector2{ .x = x + translation.x, .y = 0 + translation.y }, 0, zoom, rl.Color.white);
+                const width: f32 = @floatFromInt(texture.width);
+                x += width * 0.3;
             }
         }
     }
