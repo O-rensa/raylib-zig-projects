@@ -3,11 +3,12 @@ const rl = @import("raylib");
 
 const Texture2dArrayList = std.ArrayList(rl.Texture2D);
 const CLEAR_TEXTURES_KEY = rl.KeyboardKey.key_backspace;
-const MOUSE_WHEEL_MOVE_SENS = 0.01;
+const MOUSE_WHEEL_MOVE_SENS = 0.1;
 
 pub fn main() !void {
     const screenWidth = 800;
     const screenHeight = 450;
+    const VECTOR2ZERO = rl.Vector2.zero();
 
     rl.setConfigFlags(rl.ConfigFlags{ .window_resizable = true, .vsync_hint = true });
     rl.initWindow(screenWidth, screenHeight, "Raylib Image Viewer");
@@ -29,8 +30,15 @@ pub fn main() !void {
     }
 
     const txtr_filter = rl.TextureFilter.texture_filter_trilinear;
-    var translation = rl.Vector2{ .x = 0, .y = 0 };
-    var zoom: f32 = 0.3;
+    var target_zoom: f32 = 1;
+    var target_rotation: f32 = 0;
+
+    var camera = rl.Camera2D{
+        .offset = VECTOR2ZERO,
+        .target = VECTOR2ZERO,
+        .rotation = 0,
+        .zoom = 1,
+    };
 
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
         // deletes the all the picture(s) if backspace is clicked
@@ -41,13 +49,31 @@ pub fn main() !void {
             textures.clearRetainingCapacity();
         }
 
+        // move the image
         if (rl.isMouseButtonDown(rl.MouseButton.mouse_button_left)) {
-            translation = rl.Vector2.add(translation, rl.getMouseDelta());
+            const translation = rl.Vector2.negate(rl.Vector2.scale(rl.getMouseDelta(), 1 / target_zoom));
+            camera.target = rl.Vector2.add(camera.target, translation);
         }
 
+        // zoom or rotate
         const mouse_wheel_move = rl.getMouseWheelMove();
+        const mouse_pos = rl.getMousePosition();
         if (mouse_wheel_move != 0) {
-            zoom += mouse_wheel_move * MOUSE_WHEEL_MOVE_SENS;
+            if (rl.isKeyDown(rl.KeyboardKey.key_left_shift)) { // left shiftkey + mouse wheel move
+                // rotate
+                target_rotation += mouse_wheel_move * 10;
+                camera = focusCamera(camera, mouse_pos);
+                camera.rotation = target_rotation;
+            } else {
+                // zoom
+                if (target_zoom > 0.1) {
+                    target_zoom += mouse_wheel_move * MOUSE_WHEEL_MOVE_SENS;
+                    camera = focusCamera(camera, mouse_pos);
+                    camera.zoom = target_zoom;
+                } else {
+                    target_zoom = 0.11;
+                }
+            }
         }
 
         if (rl.isFileDropped()) {
@@ -76,13 +102,31 @@ pub fn main() !void {
             defer rl.endDrawing();
             rl.clearBackground(rl.Color.white); // background color
 
-            var x: f32 = 0;
+            var x: i32 = 0;
 
-            for (textures.items) |texture| {
-                rl.drawTextureEx(texture, rl.Vector2{ .x = x + translation.x, .y = 0 + translation.y }, 0, zoom, rl.Color.white);
-                const width: f32 = @floatFromInt(texture.width);
-                x += width * 0.3;
+            {
+                rl.beginMode2D(camera);
+                defer rl.endMode2D();
+
+                for (textures.items) |texture| {
+                    rl.drawTexture(texture, x, 0, rl.Color.white);
+                    x += texture.width;
+                }
             }
         }
     }
+}
+
+fn focusCamera(camera: rl.Camera2D, screen_position: rl.Vector2) rl.Camera2D {
+    var cam = camera; // always assume pass by reference, therefore create a clone
+    cam.target = rl.getScreenToWorld2D(screen_position, cam);
+    cam.offset = screen_position;
+    return cam;
+}
+
+// I always prefer not using pointers so the code below would not be used
+fn focusCameraPointer(camera: *rl.Camera2D, screen_position: rl.Vector2) void {
+    // pointer.* => this is how you dereference a pointer in zig
+    camera.*.target = rl.getScreenToWorld2D(screen_position, camera.*);
+    camera.*.offset = screen_position;
 }
