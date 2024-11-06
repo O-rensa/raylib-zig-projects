@@ -4,6 +4,7 @@ const rl = @import("raylib");
 const Texture2dArrayList = std.ArrayList(rl.Texture2D);
 const CLEAR_TEXTURES_KEY = rl.KeyboardKey.key_backspace;
 const MOUSE_WHEEL_MOVE_SENS = 0.1;
+//const TOGGLE_FULLSCREEN_KEY = rl.KeyboardKey.key_f;
 
 pub fn main() !void {
     const screenWidth = 800;
@@ -41,6 +42,20 @@ pub fn main() !void {
     };
 
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
+        const mouse_pos = rl.getMousePosition();
+        const mouse_wheel_move = rl.getMouseWheelMove();
+        const frame_time = rl.getFrameTime();
+        // toggle fullscreen
+        //if (rl.isKeyPressed(TOGGLE_FULLSCREEN_KEY)) {
+        //    rl.toggleFullscreen();
+        //}
+
+        // set zoom back to 1
+        if (rl.isMouseButtonDown(rl.MouseButton.mouse_button_middle)) {
+            camera = focusCamera(camera, mouse_pos);
+            target_zoom = 1;
+        }
+
         // deletes the all the picture(s) if backspace is clicked
         if (rl.isKeyPressed(CLEAR_TEXTURES_KEY)) {
             for (textures.items) |texture| {
@@ -52,26 +67,24 @@ pub fn main() !void {
         // move the image
         if (rl.isMouseButtonDown(rl.MouseButton.mouse_button_left)) {
             const translation = rl.Vector2.negate(rl.Vector2.scale(rl.getMouseDelta(), 1 / target_zoom));
-            camera.target = rl.Vector2.add(camera.target, translation);
+            camera.target = rl.Vector2.add(camera.target, rl.Vector2.rotate(translation, camera.rotation * (3.14169265 / 180.0) * (-1)));
         }
 
         // zoom or rotate
-        const mouse_wheel_move = rl.getMouseWheelMove();
-        const mouse_pos = rl.getMousePosition();
         if (mouse_wheel_move != 0) {
             if (rl.isKeyDown(rl.KeyboardKey.key_left_shift)) { // left shiftkey + mouse wheel move
                 // rotate
-                target_rotation += mouse_wheel_move * 10;
+                target_rotation += mouse_wheel_move * 15;
                 camera = focusCamera(camera, mouse_pos);
-                camera.rotation = target_rotation;
+                camera.rotation = rl.math.lerp(camera.rotation, target_rotation, (frame_time / 0.2));
             } else {
                 // zoom
-                if (target_zoom > 0.1) {
+                if (target_zoom >= 0.3) {
                     target_zoom += mouse_wheel_move * MOUSE_WHEEL_MOVE_SENS;
                     camera = focusCamera(camera, mouse_pos);
-                    camera.zoom = target_zoom;
+                    camera.zoom *= std.math.pow(f32, (target_zoom / camera.zoom), (frame_time / 0.2));
                 } else {
-                    target_zoom = 0.11;
+                    target_zoom = 0.3;
                 }
             }
         }
