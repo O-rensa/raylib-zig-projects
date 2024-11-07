@@ -3,3 +3,9 @@
 /raylib_zig_image_viewer/.zig-cache/*
 /raylib_zig_image_viewer/zig-out
 /raylib_zig_image_viewer/zig-out/*
+
+# snake game
+/snake_game/.zig-cache
+/snake_game/.zig-cache/*
+/snake_game/zig-out
+/snake_game/zig-out/*
