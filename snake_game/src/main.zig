@@ -17,7 +17,8 @@ pub fn main() !void {
 
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
-    const food = Food.newFood();
+    const food = Food.init();
+    defer food.deInit();
 
     // Main game loop
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
