@@ -2,9 +2,8 @@ const std = @import("std");
 const rl = @import("raylib");
 const dc = @import("define_const.zig");
 
-const cellSize: i32 = dc.CELLSIZE;
-const darkGreen: rl.Color = dc.DARK_GREEN;
-const foodPath = dc.FOODPATH;
+const cell_size: i32 = dc.CELLSIZE;
+const food_path = dc.FOODPATH;
 
 const Food = @This();
 // fields
@@ -15,7 +14,7 @@ position: rl.Vector2 = rl.Vector2{
 },
 
 pub fn init() Food {
-    const img = rl.loadImage(foodPath);
+    const img = rl.loadImage(food_path);
     defer rl.unloadImage(img);
     const tx = rl.loadTextureFromImage(img);
     return Food{
@@ -30,5 +29,5 @@ pub fn deInit(self: Food) void {
 pub fn draw(self: Food) void {
     const pos_x: i32 = @intFromFloat(self.position.x);
     const pos_y: i32 = @intFromFloat(self.position.y);
-    rl.drawTexture(self.texture, pos_x * cellSize, pos_y * cellSize, rl.Color.white);
+    rl.drawTexture(self.texture, pos_x * cell_size, pos_y * cell_size, rl.Color.white);
 }
