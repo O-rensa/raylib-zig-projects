@@ -3,7 +3,6 @@ const rl = @import("raylib");
 const dg = @import("define_global.zig");
 const deque = @import("deque");
 
-const food_path = dg.FOODPATH;
 const Deque = deque.Deque(rl.Vector2);
 
 const Food = @This();
@@ -12,7 +11,7 @@ texture: rl.Texture2D,
 position: rl.Vector2,
 
 pub fn init(snake_body: Deque) Food {
-    const img = rl.loadImage(food_path);
+    const img = rl.loadImage(dg.FOODPATH);
     defer rl.unloadImage(img);
     const tx = rl.loadTextureFromImage(img);
     return Food{
