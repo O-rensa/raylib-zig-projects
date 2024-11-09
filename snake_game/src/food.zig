@@ -3,8 +3,6 @@ const rl = @import("raylib");
 const dg = @import("define_global.zig");
 const deque = @import("deque");
 
-const cell_size: i32 = dg.CELLSIZE;
-const cell_count: i32 = dg.CELLCOUNT;
 const food_path = dg.FOODPATH;
 const Deque = deque.Deque(rl.Vector2);
 
@@ -23,14 +21,14 @@ pub fn init(snake_body: Deque) Food {
     };
 }
 
-pub fn deInit(self: Food) void {
+pub fn deinit(self: Food) void {
     rl.unloadTexture(self.texture);
 }
 
 pub fn draw(self: Food) void {
     const pos_x: i32 = @intFromFloat(self.position.x);
     const pos_y: i32 = @intFromFloat(self.position.y);
-    rl.drawTexture(self.texture, pos_x * cell_size, pos_y * cell_size, rl.Color.white);
+    rl.drawTexture(self.texture, dg.OFFSET + pos_x * dg.CELLSIZE, dg.OFFSET + pos_y * dg.CELLSIZE, rl.Color.white);
 }
 
 pub fn generateRandomPos(snake_body: Deque) rl.Vector2 {
@@ -43,8 +41,8 @@ pub fn generateRandomPos(snake_body: Deque) rl.Vector2 {
 }
 
 fn generateRandomCell() rl.Vector2 {
-    const x = rl.getRandomValue(0, cell_count - 1);
-    const y = rl.getRandomValue(0, cell_count - 1);
+    const x = rl.getRandomValue(0, dg.CELLCOUNT - 1);
+    const y = rl.getRandomValue(0, dg.CELLCOUNT - 1);
 
     return rl.Vector2{
         .x = @floatFromInt(x),

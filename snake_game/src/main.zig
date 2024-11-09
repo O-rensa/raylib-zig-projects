@@ -3,16 +3,19 @@ const rl = @import("raylib");
 const dg = @import("define_global.zig");
 const Game = @import("game.zig");
 
-const green: rl.Color = dg.GREEN;
-const dark_green: rl.Color = dg.DARK_GREEN;
-const cell_size: i32 = dg.CELLSIZE;
-const cell_count: i32 = dg.CELLCOUNT;
-
 pub fn main() !void {
-    const screen_width: i32 = cell_size * cell_count; // 750 px
-    const screen_height: i32 = cell_size * cell_count; // 750 px
+    const screen_width: i32 = (2 * dg.OFFSET) + dg.CELLSIZE * dg.CELLCOUNT;
+    const screen_height: i32 = (2 * dg.OFFSET) + dg.CELLSIZE * dg.CELLCOUNT;
     var last_update_time: f64 = 0;
     var hasError: bool = false;
+    var canChangeDirectionParams: bool = false;
+
+    const rect = rl.Rectangle{
+        .x = @floatFromInt(dg.OFFSET - 5),
+        .y = @floatFromInt(dg.OFFSET - 5),
+        .height = @floatFromInt(dg.CELLSIZE * dg.CELLCOUNT + 10),
+        .width = @floatFromInt(dg.CELLSIZE * dg.CELLCOUNT + 10),
+    };
 
     rl.initWindow(screen_width, screen_height, "Raylib Snake");
     defer {
@@ -24,7 +27,7 @@ pub fn main() !void {
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     var g: ?Game = Game.init() catch null;
-    defer g.?.deInit();
+    defer g.?.deinit();
 
     // Main game loop
     while (!rl.windowShouldClose() and g != null and !hasError) { // Detect window close button or ESC key
@@ -35,6 +38,7 @@ pub fn main() !void {
 
         // update snake
         if (eventTriggered(0.2, &last_update_time)) {
+            canChangeDirectionParams = true;
             game.*.update() catch {
                 hasError = true;
                 continue;
@@ -43,28 +47,45 @@ pub fn main() !void {
 
         // events
         if (rl.isKeyPressed(rl.KeyboardKey.key_up) and game.*.snake.direction.y != 1) {
-            game.*.snake.direction.x = 0;
-            game.*.snake.direction.y = -1;
+            if (canChangeDirectionParams) {
+                game.*.snake.direction.x = 0;
+                game.*.snake.direction.y = -1;
+                canChangeDirectionParams = false;
+            }
+            game.*.running = true;
         }
 
         if (rl.isKeyPressed(rl.KeyboardKey.key_down) and game.*.snake.direction.y != -1) {
-            game.*.snake.direction.x = 0;
-            game.*.snake.direction.y = 1;
+            if (canChangeDirectionParams) {
+                game.*.snake.direction.x = 0;
+                game.*.snake.direction.y = 1;
+                canChangeDirectionParams = false;
+            }
+            game.*.running = true;
         }
 
         if (rl.isKeyPressed(rl.KeyboardKey.key_left) and game.*.snake.direction.x != 1) {
-            game.*.snake.direction.x = -1;
-            game.*.snake.direction.y = 0;
+            if (canChangeDirectionParams) {
+                game.*.snake.direction.x = -1;
+                game.*.snake.direction.y = 0;
+                canChangeDirectionParams = false;
+            }
+            game.*.running = true;
         }
 
         if (rl.isKeyPressed(rl.KeyboardKey.key_right) and game.*.snake.direction.x != -1) {
-            game.*.snake.direction.x = 1;
-            game.*.snake.direction.y = 0;
+            if (canChangeDirectionParams) {
+                game.*.snake.direction.x = 1;
+                game.*.snake.direction.y = 0;
+                canChangeDirectionParams = false;
+            }
+            game.*.running = true;
         }
 
         // drawing
         {
-            rl.clearBackground(green);
+            rl.clearBackground(dg.GREEN);
+            rl.drawRectangleLinesEx(rect, 5, dg.DARK_GREEN);
             game.*.draw();
         }
     }
