@@ -1,8 +1,7 @@
 const std = @import("std");
 const rl = @import("raylib");
 const dc = @import("define_const.zig");
-const Food = @import("food.zig");
-const Snake = @import("snake.zig");
+const Game = @import("game.zig");
 
 const green: rl.Color = dc.GREEN;
 const dark_green: rl.Color = dc.DARK_GREEN;
@@ -10,32 +9,73 @@ const cell_size: i32 = dc.CELLSIZE;
 const cell_count: i32 = dc.CELLCOUNT;
 
 pub fn main() !void {
-    const screenWidth: i32 = cell_size * cell_count; // 750 px
-    const screenHeight: i32 = cell_size * cell_count; // 750 px
+    const screen_width: i32 = cell_size * cell_count; // 750 px
+    const screen_height: i32 = cell_size * cell_count; // 750 px
+    var last_update_time: f64 = 0;
+    var hasError: bool = false;
 
-    rl.initWindow(screenWidth, screenHeight, "Raylib Snake");
-    defer rl.closeWindow(); // Close window and OpenGL context
+    rl.initWindow(screen_width, screen_height, "Raylib Snake");
+    defer {
+        rl.closeWindow(); // Close window and OpenGL context
+        last_update_time = 0; // set last_update_time = 0
+        hasError = false;
+    }
 
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
-    // food
-    const food = Food.init();
-    defer food.deInit();
-    // snake
-    var snake = try Snake.init();
-    defer snake.deinit();
+    var g: ?Game = Game.init() catch null;
+    defer g.?.deInit();
 
     // Main game loop
-    while (!rl.windowShouldClose()) { // Detect window close button or ESC key
+    while (!rl.windowShouldClose() and g != null and !hasError) { // Detect window close button or ESC key
         rl.beginDrawing();
         defer rl.endDrawing();
 
+        const game = (&(g.?));
+
+        // update snake
+        if (eventTriggered(0.2, &last_update_time)) {
+            game.*.update() catch {
+                hasError = true;
+                continue;
+            };
+        }
+
+        // events
+        if (rl.isKeyPressed(rl.KeyboardKey.key_up) and game.*.snake.direction.y != 1) {
+            game.*.snake.direction.x = 0;
+            game.*.snake.direction.y = -1;
+        }
+
+        if (rl.isKeyPressed(rl.KeyboardKey.key_down) and game.*.snake.direction.y != -1) {
+            game.*.snake.direction.x = 0;
+            game.*.snake.direction.y = 1;
+        }
+
+        if (rl.isKeyPressed(rl.KeyboardKey.key_left) and game.*.snake.direction.x != 1) {
+            game.*.snake.direction.x = -1;
+            game.*.snake.direction.y = 0;
+        }
+
+        if (rl.isKeyPressed(rl.KeyboardKey.key_right) and game.*.snake.direction.x != -1) {
+            game.*.snake.direction.x = 1;
+            game.*.snake.direction.y = 0;
+        }
+
         // drawing
         {
-            try snake.update();
             rl.clearBackground(green);
-            food.draw();
-            snake.draw();
+            game.*.draw();
         }
+    }
+}
+
+fn eventTriggered(interval: f64, last_update_time: *f64) bool {
+    const currentTime: f64 = rl.getTime();
+    if ((currentTime - last_update_time.*) >= interval) {
+        last_update_time.* = currentTime;
+        return true;
+    } else {
+        return false;
     }
 }

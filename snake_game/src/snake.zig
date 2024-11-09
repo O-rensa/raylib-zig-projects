@@ -35,7 +35,7 @@ pub fn init() !Snake {
     return s;
 }
 
-pub fn deinit(self: Snake) void {
+pub fn deInit(self: Snake) void {
     self.body.deinit();
 }
 
