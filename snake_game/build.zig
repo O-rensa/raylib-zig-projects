@@ -12,6 +12,13 @@ pub fn build(b: *std.Build) void {
     const raygui = raylib_dep.module("raygui");
     const raylib_artifact = raylib_dep.artifact("raylib");
 
+    // deque dependency
+    const zig_deque_dep = b.dependency("zig-deque", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    const zig_deque = zig_deque_dep.module("zig-deque");
+
     const exe = b.addExecutable(.{
         .name = "snake_game",
         .root_source_file = b.path("src/main.zig"),
@@ -23,6 +30,9 @@ pub fn build(b: *std.Build) void {
     exe.linkLibrary(raylib_artifact);
     exe.root_module.addImport("raylib", raylib);
     exe.root_module.addImport("raygui", raygui);
+
+    // add zig_deque module to exe
+    exe.root_module.addImport("deque", zig_deque);
 
     b.installArtifact(exe);
 
