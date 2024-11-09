@@ -1,12 +1,12 @@
 const std = @import("std");
 const rl = @import("raylib");
-const dc = @import("define_const.zig");
+const dg = @import("define_global.zig");
 const Game = @import("game.zig");
 
-const green: rl.Color = dc.GREEN;
-const dark_green: rl.Color = dc.DARK_GREEN;
-const cell_size: i32 = dc.CELLSIZE;
-const cell_count: i32 = dc.CELLCOUNT;
+const green: rl.Color = dg.GREEN;
+const dark_green: rl.Color = dg.DARK_GREEN;
+const cell_size: i32 = dg.CELLSIZE;
+const cell_count: i32 = dg.CELLCOUNT;
 
 pub fn main() !void {
     const screen_width: i32 = cell_size * cell_count; // 750 px
@@ -31,7 +31,7 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        const game = (&(g.?));
+        const game = &(g.?);
 
         // update snake
         if (eventTriggered(0.2, &last_update_time)) {

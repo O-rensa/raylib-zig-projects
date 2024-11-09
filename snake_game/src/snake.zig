@@ -1,10 +1,10 @@
 const std = @import("std");
 const rl = @import("raylib");
-const dc = @import("define_const.zig");
+const dg = @import("define_global.zig");
 const deque = @import("deque");
 
-const cell_size = dc.CELLSIZE;
-const dark_green = dc.DARK_GREEN;
+const cell_size = dg.CELLSIZE;
+const dark_green = dg.DARK_GREEN;
 const allocator = std.heap.page_allocator;
 const Deque = deque.Deque(rl.Vector2);
 
@@ -15,6 +15,7 @@ direction: rl.Vector2 = rl.Vector2{
     .x = 1,
     .y = 0,
 },
+addSegment: bool = false,
 
 pub fn init() !Snake {
     var s = Snake{
@@ -57,10 +58,19 @@ pub fn draw(self: Snake) void {
 }
 
 pub fn update(self: *Snake) !void {
-    _ = self.*.body.popBack();
+    if (null == self.*.body.front()) {
+        return;
+    }
+
     const headVector = rl.Vector2{
         .x = self.*.body.front().?.x,
         .y = self.*.body.front().?.y,
     };
     try self.*.body.pushFront(rl.Vector2.add(headVector, self.*.direction));
+
+    if (self.*.addSegment) {
+        self.*.addSegment = false;
+    } else {
+        _ = self.*.body.popBack();
+    }
 }

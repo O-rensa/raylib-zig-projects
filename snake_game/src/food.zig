@@ -1,11 +1,11 @@
 const std = @import("std");
 const rl = @import("raylib");
-const dc = @import("define_const.zig");
+const dg = @import("define_global.zig");
 const deque = @import("deque");
 
-const cell_size: i32 = dc.CELLSIZE;
-const cell_count: i32 = dc.CELLCOUNT;
-const food_path = dc.FOODPATH;
+const cell_size: i32 = dg.CELLSIZE;
+const cell_count: i32 = dg.CELLCOUNT;
+const food_path = dg.FOODPATH;
 const Deque = deque.Deque(rl.Vector2);
 
 const Food = @This();
@@ -35,7 +35,7 @@ pub fn draw(self: Food) void {
 
 pub fn generateRandomPos(snake_body: Deque) rl.Vector2 {
     var position = generateRandomCell();
-    while (dc.elementInDeque(position, snake_body)) {
+    while (dg.elementInDeque(position, snake_body)) {
         position = generateRandomCell();
     }
 

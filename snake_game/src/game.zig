@@ -43,5 +43,6 @@ pub fn checkCollisionWithFood(self: *Game) void {
 
     if (1 == rl.Vector2.equals(snake_head, self.*.food.position)) {
         self.*.food.position = Food.generateRandomPos(self.*.snake.body);
+        self.*.snake.addSegment = true;
     }
 }
