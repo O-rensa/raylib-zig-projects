@@ -5,11 +5,16 @@ const deque = @import("deque");
 
 const cell_size = dc.CELLSIZE;
 const dark_green = dc.DARK_GREEN;
-const Snake = @This();
 const allocator = std.heap.page_allocator;
 const Deque = deque.Deque(rl.Vector2);
+
+const Snake = @This();
 // fields
 body: Deque,
+direction: rl.Vector2 = rl.Vector2{
+    .x = 1,
+    .y = 0,
+},
 
 pub fn init() !Snake {
     var s = Snake{
@@ -46,4 +51,13 @@ pub fn draw(self: Snake) void {
         };
         rl.drawRectangleRounded(segment, 0.5, 6, dark_green);
     }
+}
+
+pub fn update(self: *Snake) !void {
+    _ = self.*.body.popBack();
+    const headVector = rl.Vector2{
+        .x = self.*.body.front().?.x,
+        .y = self.*.body.front().?.y,
+    };
+    try self.*.body.pushFront(rl.Vector2.add(headVector, self.*.direction));
 }

@@ -22,7 +22,7 @@ pub fn main() !void {
     const food = Food.init();
     defer food.deInit();
     // snake
-    const snake = try Snake.init();
+    var snake = try Snake.init();
     defer snake.deinit();
 
     // Main game loop
@@ -32,6 +32,7 @@ pub fn main() !void {
 
         // drawing
         {
+            try snake.update();
             rl.clearBackground(green);
             food.draw();
             snake.draw();
