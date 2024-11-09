@@ -8,6 +8,8 @@ pub const DARK_GREEN = rl.Color.init(43, 51, 24, 255);
 pub const CELLSIZE: i32 = 25;
 pub const CELLCOUNT: i32 = 25;
 pub const FOODPATH = "/home/orensa/Documents/GitHub/raylib-zig-projects/snake_game/src/graphics/food.png";
+pub const EATSOUNDPATH = "/home/orensa/Documents/GitHub/raylib-zig-projects/snake_game/src/sounds/eat.mp3";
+pub const WALLSOUNDPATH = "/home/orensa/Documents/GitHub/raylib-zig-projects/snake_game/src/sounds/wall.mp3";
 pub const ALLOCATOR = std.heap.page_allocator;
 pub const OFFSET: i32 = 75;
 

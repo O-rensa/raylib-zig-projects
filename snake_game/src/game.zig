@@ -11,18 +11,27 @@ const Game = @This();
 snake: Snake,
 food: Food,
 running: bool = true,
+score: i32 = 0,
+eatSound: rl.Sound,
+wallSound: rl.Sound,
 
 pub fn init() !Game {
+    rl.initAudioDevice();
     const s = try Snake.init();
     return Game{
         .snake = s,
         .food = Food.init(s.body),
+        .eatSound = rl.loadSound(dg.EATSOUNDPATH),
+        .wallSound = rl.loadSound(dg.WALLSOUNDPATH),
     };
 }
 
 pub fn deinit(self: Game) void {
     self.snake.deinit();
     self.food.deinit();
+    rl.unloadSound(self.eatSound);
+    rl.unloadSound(self.wallSound);
+    rl.closeAudioDevice();
 }
 
 pub fn draw(self: Game) void {
@@ -52,6 +61,8 @@ pub fn checkCollisionWithFood(self: *Game) void {
     if (1 == rl.Vector2.equals(snake_head, self.*.food.position)) {
         self.*.food.position = Food.generateRandomPos(self.*.snake.body);
         self.*.snake.addSegment = true;
+        self.*.score += 1;
+        rl.playSound(self.*.eatSound);
     }
 }
 
@@ -98,4 +109,6 @@ pub fn gameOver(self: *Game) !void {
     try self.*.snake.reset();
     self.*.food.position = Food.generateRandomPos(self.*.snake.body);
     self.*.running = false;
+    self.*.score = 0;
+    rl.playSound(self.*.wallSound);
 }

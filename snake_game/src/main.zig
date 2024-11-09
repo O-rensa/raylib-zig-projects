@@ -86,6 +86,8 @@ pub fn main() !void {
         {
             rl.clearBackground(dg.GREEN);
             rl.drawRectangleLinesEx(rect, 5, dg.DARK_GREEN);
+            rl.drawText("Retro Snake", dg.OFFSET - 5, 20, 40, dg.DARK_GREEN);
+            rl.drawText(rl.textFormat("%i", .{game.*.score}), dg.OFFSET - 5, dg.OFFSET + dg.CELLSIZE * dg.CELLCOUNT + 10, 40, dg.DARK_GREEN);
             game.*.draw();
         }
     }
