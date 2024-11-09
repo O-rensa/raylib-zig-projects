@@ -41,6 +41,9 @@ pub fn deInit(self: Snake) void {
 
 pub fn draw(self: Snake) void {
     for (0..self.body.len()) |idx| {
+        if (null == self.body.get(idx)) {
+            break;
+        }
         const pos_x: f32 = self.body.get(idx).?.x;
         const pos_y: f32 = self.body.get(idx).?.y;
         const segment = rl.Rectangle{

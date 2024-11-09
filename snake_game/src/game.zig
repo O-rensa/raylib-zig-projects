@@ -1,3 +1,5 @@
+const std = @import("std");
+const rl = @import("raylib");
 const Snake = @import("snake.zig");
 const Food = @import("food.zig");
 
@@ -7,9 +9,10 @@ snake: Snake,
 food: Food,
 
 pub fn init() !Game {
+    const s = try Snake.init();
     return Game{
-        .snake = try Snake.init(),
-        .food = Food.init(),
+        .snake = s,
+        .food = Food.init(s.body),
     };
 }
 
@@ -25,4 +28,20 @@ pub fn draw(self: Game) void {
 
 pub fn update(self: *Game) !void {
     try self.*.snake.update();
+    checkCollisionWithFood(self);
+}
+
+pub fn checkCollisionWithFood(self: *Game) void {
+    if (null == self.*.snake.body.front()) {
+        return;
+    }
+
+    const snake_head = rl.Vector2{
+        .x = self.*.snake.body.front().?.x,
+        .y = self.*.snake.body.front().?.y,
+    };
+
+    if (1 == rl.Vector2.equals(snake_head, self.*.food.position)) {
+        self.*.food.position = Food.generateRandomPos(self.*.snake.body);
+    }
 }
