@@ -2,12 +2,11 @@ const std = @import("std");
 const rl = @import("raylib");
 
 pub fn main() !void {
-    const screenWidth = 800;
-    const screenHeight = 450;
+    const screen_width = 1280;
+    const screen_height = 800;
 
-    rl.initWindow(screenWidth, screenHeight, "raylib-zig Pong Game");
+    rl.initWindow(screen_width, screen_height, "raylib-zig Pong Game");
     defer rl.closeWindow(); // Close window and OpenGL context
-
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     // Main game loop

@@ -18,11 +18,13 @@ wallSound: rl.Sound,
 pub fn init() !Game {
     rl.initAudioDevice();
     const s = try Snake.init();
+    const eat_sound = dg.CWD ++ dg.EATSOUNDPATH; // []const u8 + [*:0]const u8 => [*:0]const u8
+    const wall_sound = dg.CWD ++ dg.WALLSOUNDPATH; // array + zero terminated array => zerro terminated array
     return Game{
         .snake = s,
         .food = Food.init(s.body),
-        .eatSound = rl.loadSound(dg.EATSOUNDPATH),
-        .wallSound = rl.loadSound(dg.WALLSOUNDPATH),
+        .eatSound = rl.loadSound(eat_sound), // there is no need to convert
+        .wallSound = rl.loadSound(wall_sound), // since result is [*:0]const u8
     };
 }
 

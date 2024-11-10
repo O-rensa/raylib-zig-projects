@@ -11,7 +11,8 @@ texture: rl.Texture2D,
 position: rl.Vector2,
 
 pub fn init(snake_body: Deque) Food {
-    const img = rl.loadImage(dg.FOODPATH);
+    const food_path = dg.CWD ++ dg.FOODPATH; // dg.CWD and dg.FOODPATH is both []const u8;
+    const img = rl.loadImage(@as([*:0]const u8, @ptrCast(food_path))); // convert []const u8 to [*:0]const u8
     defer rl.unloadImage(img);
     const tx = rl.loadTextureFromImage(img);
     return Food{
