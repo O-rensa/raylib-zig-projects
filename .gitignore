@@ -9,3 +9,9 @@
 /snake_game/.zig-cache/*
 /snake_game/zig-out
 /snake_game/zig-out/*
+
+# pong game
+/pong_game/.zig-cache
+/pong_game/.zig-cache/*
+/pong_game/zig-out
+/pong_game/zig-out/*
