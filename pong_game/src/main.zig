@@ -14,8 +14,14 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        // drawing
+        {
+            rl.drawLine(screen_width / 2, 0, screen_width / 2, screen_height, rl.Color.white);
+            // draw circle on the middle of the screen;
+            rl.drawCircle(screen_width / 2, screen_height / 2, 20, rl.Color.white);
 
-        rl.drawText("Congrats! You created your first window!", 190, 200, 20, rl.Color.light_gray);
+            rl.drawRectangle(10, screen_height / 2 - 60, 25, 120, rl.Color.white);
+            rl.drawRectangle(screen_width - 35, screen_height / 2 - 60, 25, 120, rl.Color.white);
+        }
     }
 }
