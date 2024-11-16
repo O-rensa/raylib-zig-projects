@@ -15,7 +15,7 @@ pub fn main() !void {
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     // ball
-    var ball = Ball.init(20, screen_width / 2, screen_height / 2, 7, 7);
+    var ball = Ball.init(20, 7, 7);
     var player = Paddle.init(
         df.SCREEN_WIDTH - df.PADDLE_WIDTH - 10,
         (df.SCREEN_HEIGHT / 2) - (df.PADDLE_HEIGHT / 2),
@@ -26,6 +26,15 @@ pub fn main() !void {
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
         rl.beginDrawing();
         defer rl.endDrawing();
+
+        // check for collision between ball and paddles
+        {
+            const playerRect = rl.Rectangle{ .height = player.height, .width = player.width, .x = @floatFromInt(player.x), .y = @floatFromInt(player.y) };
+            const cpuRect = rl.Rectangle{ .height = cpu.paddle.height, .width = cpu.paddle.width, .x = @floatFromInt(cpu.paddle.x), .y = @floatFromInt(cpu.paddle.y) };
+
+            ball.checkForCollisionWithPaddle(playerRect);
+            ball.checkForCollisionWithPaddle(cpuRect);
+        }
 
         // update
         {
@@ -43,8 +52,15 @@ pub fn main() !void {
             // draw circle on the middle of the screen;
             ball.draw();
 
+            // draw paddles
             cpu.draw();
             player.draw();
+
+            // draw scores
+            // cpu
+            rl.drawText(rl.textFormat("%i", .{ball.cpu_score}), (screen_width / 4) - 20, 20, 80, rl.Color.white);
+            // player
+            rl.drawText(rl.textFormat("%i", .{ball.player_score}), 3 * (screen_width / 4) - 20, 20, 80, rl.Color.white);
         }
     }
 }
