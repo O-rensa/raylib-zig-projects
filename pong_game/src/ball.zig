@@ -28,4 +28,15 @@ pub fn draw(self: Ball) void {
 pub fn update(self: *Ball) void {
     self.*.y += @as(f32, @floatFromInt(self.*.speed_y));
     self.*.x += @as(f32, @floatFromInt(self.speed_x));
+
+    const y: i32 = @intFromFloat(self.*.y);
+    const x: i32 = @intFromFloat(self.*.x);
+
+    if ((y + self.*.radius) >= rl.getScreenHeight() or (y - self.*.radius) <= 0) {
+        self.*.speed_y *= -1;
+    }
+
+    if ((x + self.*.radius) >= rl.getScreenWidth() or (x - self.*.radius) <= 0) {
+        self.*.speed_x *= -1;
+    }
 }
